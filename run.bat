@@ -1,0 +1,12 @@
+javac King.java
+javac Pawn.java
+javac Bishop.java
+javac Knight.java
+javac Rook.java
+javac Queen.java
+javac Piece.java
+javac Grid.java
+javac Board.java
+javac JChess.java
+java JChess
+cmd.exe /k
