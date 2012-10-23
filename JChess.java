@@ -25,12 +25,12 @@ public class JChess extends JFrame{
     Board board;    
 
     public JChess(){
-        JFrame frame=new JFrame("Chess - version 0.3 Beta");
-        frame.setSize(415,435);
+        super("JChess - version 0.3 Beta");
+        setSize(415,435);
         Board board=new Board();
-        frame.setContentPane(board);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setContentPane(board);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public static void main(String args[]){

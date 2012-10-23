@@ -27,8 +27,10 @@ public class ChessServer implements Runnable{
 	private static Socket socket; 
     private int player;
     private String nick;
+	private int time;
 	public static final Object synch = new Object(); 
 	public static Map<String, ChessServer> connectionMap = new HashMap<String, ChessServer>();  
+	public static Grid[][] grid=new Grid[8][8];
 	
 	public ChessServer(Socket socket){ 
         this.socket = socket;
@@ -46,6 +48,11 @@ public class ChessServer implements Runnable{
 			port=1000;
 		}
 		System.out.println("Server Started. Waiting for connections");
+		for (int i=0;i<8;i++){
+            for (int j=0;j<8;j++){
+                grid[i][j]=new Grid(j*50,i*50);
+            }
+        }
 		try{
 			ServerSocket listener=new ServerSocket(port);
 			while(true){
@@ -146,6 +153,31 @@ public class ChessServer implements Runnable{
                 ChessServer channel=connectionMap.get(nicka);
                 allsend("LOGOUT "+nick); 
 				connectionMap.remove(nick);
+				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+					if (player>ocon.getValue().player){
+						ocon.getValue().player-=1;
+					}
+				}
+				boolean onec=false,twoc=false;
+				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+					if (ocon.getValue().player==1){
+						onec=true;
+					}
+				}
+				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+					if (ocon.getValue().player==2){
+						twoc=true;
+					}
+				}
+				if (player==1||player==2){
+					if (onec&&twoc){
+						allsend("START");
+						startboard();
+					}
+					if (onec&&(!twoc)){
+						allsend("WAIT");
+					}
+				}
 				socket.close();
             }
         }
@@ -176,78 +208,117 @@ public class ChessServer implements Runnable{
         }
     }
 	
+	public static void startboard(){
+		for (int i=0;i<8;i++){
+            (grid[1][i]).changePiece(Pawn.value);
+            (grid[6][i]).changePiece(Pawn.value);
+            (grid[6][i]).changeOwner(true);
+        }
+        grid[0][1].changePiece(Knight.value);
+        grid[0][6].changePiece(Knight.value);
+        grid[7][1].changePiece(Knight.value);
+        grid[7][6].changePiece(Knight.value);
+        grid[7][1].changeOwner(true);
+        grid[7][6].changeOwner(true);
+        grid[0][2].changePiece(Bishop.value);
+        grid[0][5].changePiece(Bishop.value);
+        grid[7][2].changePiece(Bishop.value);
+        grid[7][5].changePiece(Bishop.value);
+        grid[7][2].changeOwner(true);
+        grid[7][5].changeOwner(true);
+        grid[0][0].changePiece(Rook.value);
+        grid[0][7].changePiece(Rook.value);
+        grid[7][0].changePiece(Rook.value);
+        grid[7][7].changePiece(Rook.value);
+        grid[7][0].changeOwner(true);
+        grid[7][7].changeOwner(true);
+        grid[0][3].changePiece(Queen.value);
+        grid[0][4].changePiece(King.value);
+        grid[7][3].changePiece(Queen.value);
+        grid[7][4].changePiece(King.value);
+        grid[7][3].changeOwner(true);
+        grid[7][4].changeOwner(true);
+	}
+	
 	public enum Command{
 		AUTH(1, 1){
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-				String urln="http://enkrypt.in/abstergo/det.php?id="+arguments[0]+"&t="+Math.random(); //setting up stuff for MySQL connection
-				String name="";
-				int userid=0,access=0;
-				try{
-					URL url=new URL(urln);
-					BufferedReader rea=new BufferedReader(new InputStreamReader(url.openStream()));
-					String lin="",cres="";
-					while ((lin=rea.readLine())!=null){
-						cres+=lin;
-					}
-					rea.close();
-					String[] cren=cres.split(" ");
-					userid=Integer.parseInt(cren[0]);
-					name=cren[1];
-					access=Integer.parseInt(cren[2]);
-				}
-				catch(Exception e){ e.printStackTrace();
-					userid=0;
-					name="";
-					access=0;
-				}
-				if (name.equals("")){ //somethings gone really wrong - client isnt supposed to send invalid session
-					userid=0;
-					name="Guest";
-					access=0;
-					con.send("AUTH Guest");
+				if (arguments[0].equals("")){ 
 					con.send("LOGOUT Bye");
 					con.sendQuit("Invalid");
 					connectionMap.remove(con.nick);
 				}
 				else{
-					con.nick=name;
+					con.nick=arguments[0];
 					synchronized (synch){
-						ChessServer testconn=connectionMap.get(con.nick); //test if theres already a similar connection
-						if (testconn!=null){
-							con.sendSelfNotice("Apparently your client got screwed up cause you like closing the browser to quit chat. Next time , type '/LOGOUT'. For now , just refresh the page and try again.");
-							testconn.sendSelfNotice("Apparently your client got screwed up cause you like closing the browser to quit chat. Next time , type '/LOGOUT'. For now , just refresh the page and try again.");
-							con.send("LOGOUT Bye");
-							testconn.send("LOGOUT Bye");
-							testconn.sendQuit("Invalid");
-							connectionMap.remove(testconn.nick);
-							ChessServer testlol=null;
-							while((testlol=connectionMap.get(con.nick))!=null){
-								testlol.send("LOGOUT Bye");
-								testlol.sendQuit("Invalid");
-								connectionMap.remove(testlol.nick);
-								System.out.println("Removing extra connections for "+con.nick);
+						con.player=connectionMap.size()+1;
+						connectionMap.put(con.nick, con);
+						allsend("AUTH "+con.player+" "+con.nick);
+						allsend("PLAYER "+con.player+" "+con.nick);
+						con.sendSelfNotice("Welcome to JChess Server. "+con.nick);
+						con.sendSelfNotice("Written by EnKrypt");
+						String listmem="USERS";
+						for (Map.Entry<String , ChessServer> member : connectionMap.entrySet()){
+							listmem+=" "+member.getValue().nick;
+						}
+						con.send(listmem);
+						if (con.player==1){
+							con.send("WAIT");
+						}
+						else if (con.player>2){
+							con.send("SPECTATE");
+							String allpiece="ALLPIECE";
+							for (int i=0;i<8;i++){
+								for (int j=0;j<8;j++){
+									if (grid[i][j].piece!=100){
+										allpiece+=" "+i+"~"+j+"~"+grid[i][j].piece+"~"+grid[i][j].owner;
+									}
+								}
 							}
 						}
-						else{
-							connectionMap.put(con.nick, con); //add the connection
-							con.send("AUTH "+con.nick); //send AUTH back to client
-							con.sendSelfNotice("Looked up Session. Received User"); //Send Welcome messages and Stuff
-							con.sendSelfNotice("**Connection Authenticated and Established**");
-							con.sendSelfNotice("*");
-							con.sendSelfNotice("Welcome to Abstergo's Chat Server. "+con.nick);
-							con.sendSelfNotice("Written by EnKrypt");
-							con.sendSelfNotice("*");
-							con.sendSelfNotice("Type '/JOIN <channel>' to join a channel");
-							con.sendSelfNotice("Deafult channel is #ac. Type '/JOIN #ac' to join that channel");
+						else if (con.player==2){
+							allsend("START");
+							startboard();
 						}
 					}
 				}
 			}
 		},
-		USERS(1, 1){ //get list of users in that channel
+		MOVE(4,4){
+			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
+				grid[Integer.parseInt(arguments[2])][Integer.parseInt(arguments[3])].changePiece(grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].piece);
+                grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].changePiece(100);
+                grid[Integer.parseInt(arguments[2])][Integer.parseInt(arguments[3])].changeOwner(grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].owner);
+                grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].changeOwner(false);
+				allsend("MOVE "+arguments[0]+" "+arguments[1]+" "+arguments[2]+" "+arguments[3]);
+			}
+		},
+		CHECKMATE(1,1){
+			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
+				int mep=Integer.parseInt(arguments[0]);
+				int yop=1;
+				if (mep==1){
+					yop=2;
+				}
+				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+					if (ocon.getValue().player==mep){
+						ocon.getValue().send("WIN");
+					}
+					else if (ocon.getValue().player==yop){
+						ocon.getValue().send("LOSE");
+					}
+					else{
+						ocon.getValue().send("WIN "+con.nick);
+					}
+					
+				}
+				allsend("SEND "+arguments[0]+" "+con.nick);
+			}
+		},
+		USERS(1, 1){ 
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
 				String listmem="USERS";
-				for (Map.Entry<String , ChessServer> member : connectionMap.entrySet()){ //give list of members
+				for (Map.Entry<String , ChessServer> member : connectionMap.entrySet()){
 					listmem+=" "+member.getValue().nick;
 				}
 				con.send(listmem);
@@ -255,27 +326,22 @@ public class ChessServer implements Runnable{
 		},
 		LOGOUT(1, 1){
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-				con.send("LOGOUT Bye"); //client will understand this as end of communication
+				con.send("LOGOUT Bye");
                 con.sendQuit("");
             }
 		},
 		SEND(1,1){
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-				allsend("SEND "+arguments[0]+" "+con.nick); //Send message to all members including sender
-			}
-		},
-		ME(2,2){ //same as SEND , will be interpreted differently by Client
-			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-				allsend("ME "+arguments[0]+" "+arguments[1]+" "+con.nick);
+				allsend("SEND "+arguments[0]+" "+con.nick);
 			}
 		},
 		PING(1, 1){
             public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-                con.send("PONG "+arguments[0]); //return same argument
+                con.send("PONG "+arguments[0]);
             }
         };
-		int minArgumentCount; //minimum number of arguments for the command
-        int maxArgumentCount; //maximum number of arguments for the command
+		int minArgumentCount; 
+        int maxArgumentCount; 
         
         Command(int min, int max){
             minArgumentCount = min;
@@ -290,6 +356,6 @@ public class ChessServer implements Runnable{
             return maxArgumentCount;
         }
 		
-		public abstract void run(ChessServer con, String prefix, String[] arguments) throws Exception; //runs command
+		public abstract void run(ChessServer con, String prefix, String[] arguments) throws Exception;
 	}
 }

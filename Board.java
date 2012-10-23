@@ -148,7 +148,7 @@ class Board extends JPanel implements MouseListener{
         }
     }
     
-    public void mousePressed(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
     
     }
     public void mouseReleased(MouseEvent e) {
@@ -160,7 +160,7 @@ class Board extends JPanel implements MouseListener{
     public void mouseExited(MouseEvent e) {
     
     }
-    public void mouseClicked(MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
         for (int i=0;i<8;i++){
             for (int j=0;j<8;j++){
                 if (grid[i][j].x==e.getX()-(e.getX()%50)&&grid[i][j].y==e.getY()-(e.getY()%50)&&grid[i][j].selected){
