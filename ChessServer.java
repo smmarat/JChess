@@ -383,28 +383,6 @@ public class ChessServer implements Runnable{
 				}
 			}
 		},
-		CHECKMATE(1,1){
-			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-				int mep=Integer.parseInt(arguments[0]);
-				int yop=1;
-				if (mep==1){
-					yop=2;
-				}
-				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
-					if (ocon.getValue().player==mep){
-						ocon.getValue().send("WIN");
-					}
-					else if (ocon.getValue().player==yop){
-						ocon.getValue().send("LOSE");
-					}
-					else{
-						ocon.getValue().send("WIN "+con.nick);
-					}
-					
-				}
-				allsend("SEND "+arguments[0]+" "+con.nick);
-			}
-		},
 		USERS(1, 1){ 
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
 				String listmem="USERS";
