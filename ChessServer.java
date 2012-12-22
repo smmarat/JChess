@@ -13,7 +13,7 @@
 //   *  You should have received a copy of the GNU General Public License     *
 //   *  along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 //   *                                                                        *
-//   *                   (C) Arvind Kumar 2011 .                              *
+//   *                   (C) Arvind Kumar 2013 .                              *
 //   **************************************************************************
 
 
@@ -31,6 +31,9 @@ public class ChessServer implements Runnable{
 	public static final Object synch = new Object(); 
 	public static Map<String, ChessServer> connectionMap = new HashMap<String, ChessServer>();  
 	public static Grid[][] grid=new Grid[8][8];
+	public static int turn=1;
+	private int ping=100000;
+	public static int timer=0;
 	
 	public ChessServer(Socket socket){ 
         this.socket = socket;
@@ -53,6 +56,7 @@ public class ChessServer implements Runnable{
                 grid[i][j]=new Grid(j*50,i*50);
             }
         }
+		pingPoll.start();
 		try{
 			ServerSocket listener=new ServerSocket(port);
 			while(true){
@@ -74,7 +78,7 @@ public class ChessServer implements Runnable{
 		catch(Exception e){ 
 			if (nick!=null&&connectionMap.get(nick)==this){ 
                 try{
-					sendQuit("Leaving");
+					sendQuit("Something went wrong");
 				}
 				catch(Exception ex){ }
             }
@@ -116,6 +120,29 @@ public class ChessServer implements Runnable{
             }
         }
     };
+	public static Thread pingPoll=new Thread(){ 
+        public void run(){
+			while(true){
+				try{
+					Thread.sleep(1000);
+				}
+				catch (Exception e){
+				}
+				timer++;
+				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+					if (ocon.getValue().ping!=100000&&timer%10==0){
+						ocon.getValue().send("PING "+timer);
+					}
+				}
+				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+					if (ocon.getValue().ping!=100000&&timer-ocon.getValue().ping>50){
+						ocon.getValue().send("LOGOUT Ping Timout");
+						ocon.getValue().sendQuit("Ping Timeout");
+					}
+				}
+			}
+        }
+    };
 	
 	public void evaluate(String line)throws Exception{
         System.out.println("Evaluating - "+nick+": "+line);
@@ -149,37 +176,36 @@ public class ChessServer implements Runnable{
 	
 	public void sendQuit(String mess)throws Exception{ 
         synchronized (synch){
-            for (String nicka : new ArrayList<String>(connectionMap.keySet())){
-                ChessServer channel=connectionMap.get(nicka);
-                allsend("LOGOUT "+nick); 
-				connectionMap.remove(nick);
-				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
-					if (player>ocon.getValue().player){
-						ocon.getValue().player-=1;
-					}
+			mess=mess.replace("%","%25").replace(" ","%20");
+            allsend("LOGOUT "+nick+" "+mess); 
+			connectionMap.remove(nick);
+			for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+				if (player>ocon.getValue().player){
+					ocon.getValue().player-=1;
+					allsend("PLAYER "+ocon.getValue().player+" "+ocon.getValue().nick);
 				}
-				boolean onec=false,twoc=false;
-				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
-					if (ocon.getValue().player==1){
-						onec=true;
-					}
+			}
+			boolean onec=false,twoc=false;
+			for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+				if (ocon.getValue().player==1){
+					onec=true;
 				}
-				for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
-					if (ocon.getValue().player==2){
-						twoc=true;
-					}
+			}
+			for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+				if (ocon.getValue().player==2){
+					twoc=true;
 				}
-				if (player==1||player==2){
-					if (onec&&twoc){
-						allsend("START");
-						startboard();
-					}
-					if (onec&&(!twoc)){
-						allsend("WAIT");
-					}
+			}
+			if (player==1||player==2){
+				if (onec&&twoc){
+					allsend("START");
+					startboard();
 				}
-				socket.close();
-            }
+				if (onec&&(!twoc)){
+					allsend("WAIT");
+				}
+			}
+			socket.close();
         }
     }
 	
@@ -209,6 +235,11 @@ public class ChessServer implements Runnable{
     }
 	
 	public static void startboard(){
+		for (int i=0;i<8;i++){
+            for (int j=0;j<8;j++){
+                grid[i][j]=new Grid(j*50,i*50);
+            }
+        }
 		for (int i=0;i<8;i++){
             (grid[1][i]).changePiece(Pawn.value);
             (grid[6][i]).changePiece(Pawn.value);
@@ -240,13 +271,21 @@ public class ChessServer implements Runnable{
         grid[7][4].changeOwner(true);
 	}
 	
+	public static void checkmate(){
+		//TODO - FINISH CHECKING MECHANISM
+	}
+	
 	public enum Command{
 		AUTH(1, 1){
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
+				ChessServer testcon=connectionMap.get(arguments[0]);
 				if (arguments[0].equals("")){ 
 					con.send("LOGOUT Bye");
-					con.sendQuit("Invalid");
-					connectionMap.remove(con.nick);
+					con.sendQuit("Authenticated with Invalid Username.");
+				}
+				else if (testcon!=null){
+					con.send("LOGOUT Username alreadu exists");
+					con.sendQuit("Authenticated using duplicate username.");
 				}
 				else{
 					con.nick=arguments[0];
@@ -254,9 +293,12 @@ public class ChessServer implements Runnable{
 						con.player=connectionMap.size()+1;
 						connectionMap.put(con.nick, con);
 						allsend("AUTH "+con.player+" "+con.nick);
+						con.sendSelfNotice("*************************************");
+						con.sendSelfNotice("Welcome to JChess Server, "+con.nick);
+						con.sendSelfNotice("       Developed by EnKrypt");
+						con.sendSelfNotice("*************************************");
+						con.ping=timer;
 						allsend("PLAYER "+con.player+" "+con.nick);
-						con.sendSelfNotice("Welcome to JChess Server. "+con.nick);
-						con.sendSelfNotice("Written by EnKrypt");
 						String listmem="USERS";
 						for (Map.Entry<String , ChessServer> member : connectionMap.entrySet()){
 							listmem+=" "+member.getValue().nick;
@@ -286,11 +328,59 @@ public class ChessServer implements Runnable{
 		},
 		MOVE(4,4){
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
-				grid[Integer.parseInt(arguments[2])][Integer.parseInt(arguments[3])].changePiece(grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].piece);
-                grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].changePiece(100);
-                grid[Integer.parseInt(arguments[2])][Integer.parseInt(arguments[3])].changeOwner(grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].owner);
-                grid[Integer.parseInt(arguments[0])][Integer.parseInt(arguments[1])].changeOwner(false);
-				allsend("MOVE "+arguments[0]+" "+arguments[1]+" "+arguments[2]+" "+arguments[3]);
+				if (turn==con.player){
+					try{
+						int a1=Integer.parseInt(arguments[0]);
+						int a2=Integer.parseInt(arguments[1]);
+						int b1=Integer.parseInt(arguments[2]);
+						int b2=Integer.parseInt(arguments[3]);
+						if (grid[a1][a2].piece!=100){
+							if(Piece.parse(grid[a1][a2].piece).placeMoves(grid)[b1][b2]){
+								grid[b1][b2].changePiece(grid[a1][a2].piece);
+								grid[a1][a2].changePiece(100);
+								grid[b1][b2].changeOwner(grid[a1][a2].owner);
+								grid[a1][a2].changeOwner(false);
+								allsend("MOVE "+arguments[0]+" "+arguments[1]+" "+arguments[2]+" "+arguments[3]+" "+con.nick);
+								int checkwin=0;
+								if ((checkwin=checkmate())>0){
+									allsend("WIN "+checkwin);
+									if (checkwin==1){
+										allsend("LOSE 2");
+									}
+									else if (checkwin==2){
+										allsend("LOSE 1");
+									}
+									int cursize=connectionMap.size();
+									for (Map.Entry<String , ChessServer> member : connectionMap.entrySet()){
+										if (member.getValue().player==2){
+											member.getValue().player=cursize+1;
+										}
+										if (member.getValue().player==1){
+											member.getValue().player=cursize+2;
+										}
+									}
+									for (Map.Entry<String , ChessServer> ocon : connectionMap.entrySet()){
+										ocon.getValue().player-=2;
+										allsend("PLAYER "+ocon.getValue().player+" "+ocon.getValue().nick);
+									}
+									allsend("START");
+								}
+							}
+							else{
+								con.sendSelfNotice("That piece does not have the ability to move to that grid");
+							}
+                        }
+						else{
+							con.sendSelfNotice("You cannot move an empty grid");
+						}
+					}
+					catch(Exception e){
+						con.sendSelfNotice("Invalid Grid co-ordinates to move");
+					}
+				}
+				else{
+					con.sendSelfNotice("It is not your turn to play");
+				}
 			}
 		},
 		CHECKMATE(1,1){
@@ -327,7 +417,12 @@ public class ChessServer implements Runnable{
 		LOGOUT(1, 1){
 			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
 				con.send("LOGOUT Bye");
-                con.sendQuit("");
+                con.sendQuit("Manual Disconnect");
+            }
+		},
+		PONG(1, 1){
+			public void run(ChessServer con, String prefix, String[] arguments)throws Exception{
+				con.ping=timer;
             }
 		},
 		SEND(1,1){
