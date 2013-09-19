@@ -27,6 +27,7 @@ class Board extends JPanel implements MouseListener {
 
     Grid[][] grid;
     boolean white = true;
+    private boolean currTurn = true;
 
     public Board() {
         addMouseListener(this);
@@ -175,12 +176,13 @@ class Board extends JPanel implements MouseListener {
                     for (int ii = 0; ii < 8; ii++) {
                         for (int jj = 0; jj < 8; jj++) {
                             if (grid[ii][jj].selected && grid[ii][jj].piece != 100) {
-                                if (Piece.parse(grid[ii][jj].piece).placeMoves(grid)[i][j]) {
+                                if (Piece.parse(grid[ii][jj].piece).placeMoves(grid)[i][j] && grid[ii][jj].owner==currTurn) {
                                     grid[i][j].changePiece(grid[ii][jj].piece);
                                     grid[ii][jj].changePiece(100);
                                     grid[i][j].changeOwner(grid[ii][jj].owner);
                                     grid[ii][jj].changeOwner(false);
                                     grid[ii][jj].deselect();
+                                    currTurn = !currTurn;
                                 }
                             }
                         }

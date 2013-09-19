@@ -43,13 +43,13 @@ public class ChessServer implements Runnable {
 
     public static void main(String args[]) {
         BufferedReader b = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("PORT ( default - 1000 ): ");
-        int port = 1000;
+        System.out.print("PORT ( default - 8000 ): ");
+        int port = 8000;
         try {
             port = Integer.parseInt(b.readLine());
         } catch (Exception e) {
-            System.out.println("Wrong format. Using 1000 instead");
-            port = 1000;
+            System.out.println("Wrong format. Using 8000 instead");
+            port = 8000;
         }
         System.out.println("Server Started. Waiting for connections");
         for (int i = 0; i < 8; i++) {
