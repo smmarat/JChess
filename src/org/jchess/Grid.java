@@ -17,36 +17,41 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
-public class Grid{
-    int piece=100;
+public class Grid {
+    int piece = 100;
     int x;
     int y;
-    boolean selected=false;
-    boolean owner=false;
-    boolean moveallowed=false;
-    
-    public Grid(int gx,int gy){
-        x=gx;
-        y=gy;
+    boolean selected = false;
+    boolean owner = false;
+    boolean moveallowed = false;
+
+    public Grid(int gx, int gy) {
+        x = gx;
+        y = gy;
     }
-    
-    public void changePiece(int gp){
-        piece=gp;
+
+    public void changePiece(int gp) {
+        piece = gp;
     }
-    public void changeOwner(boolean gb){
-        owner=gb;
+
+    public void changeOwner(boolean gb) {
+        owner = gb;
     }
-    public void select(){
-        selected=true;
+
+    public void select() {
+        selected = true;
     }
-    public void deselect(){
-        selected=false;
+
+    public void deselect() {
+        selected = false;
     }
-    public void moveallow(){
-        moveallowed=true;
+
+    public void moveallow() {
+        moveallowed = true;
     }
-    public void moveunallow(){
-        moveallowed=false;
+
+    public void moveunallow() {
+        moveallowed = false;
     }
 
     public boolean isSelected() {

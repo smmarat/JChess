@@ -19,26 +19,26 @@ Please note that in the event that any source file or other resource in this pro
 
 import javax.swing.*;
 
-public class JChess extends JFrame{
-    
-    Board board;    
+public class JChess extends JFrame {
 
-    public JChess(){
+    Board board;
+
+    public JChess() {
         super("org.jchess.JChess - version 0.3 Beta");
-        setSize(415,435);
-        Board board=new Board();
+        setSize(415, 435);
+        Board board = new Board();
         setContentPane(board);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public static void main(String args[]){
-        JChess chess=new JChess();
+    public static void main(String args[]) {
+        JChess chess = new JChess();
         chess.begin();
     }
-    
-    public void begin(){
-        
+
+    public void begin() {
+
     }
-    
+
 }
