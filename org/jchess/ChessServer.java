@@ -1,4 +1,4 @@
-//   **************************************************************************
+package org.jchess;//   **************************************************************************
 //   *                                                                        *
 //   *  This program is free software: you can redistribute it and/or modify  *
 //   *  it under the terms of the GNU General Public License as published by  *
@@ -17,7 +17,9 @@
 //   **************************************************************************
 
 
-import java.io.*; 
+import org.jchess.figures.*;
+
+import java.io.*;
 import java.net.*; 
 import java.util.*; 
 import java.util.concurrent.*; 
@@ -174,7 +176,7 @@ public class ChessServer implements Runnable{
 			commandObject.run(this, prefix, arguments); 
     }
 	
-	public void sendQuit(String mess)throws Exception{ 
+	public void sendQuit(String mess){
         synchronized (synch){
 			mess=mess.replace("%","%25").replace(" ","%20");
             allsend("LOGOUT "+nick+" "+mess); 
@@ -205,7 +207,11 @@ public class ChessServer implements Runnable{
 					allsend("WAIT");
 				}
 			}
-			socket.close();
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 	
@@ -271,8 +277,9 @@ public class ChessServer implements Runnable{
         grid[7][4].changeOwner(true);
 	}
 	
-	public static void checkmate(){
+	public static int checkmate(){
 		//TODO - FINISH CHECKING MECHANISM
+        return 0;
 	}
 	
 	public enum Command{
