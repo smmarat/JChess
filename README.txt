@@ -15,6 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 Please note that in the event that any source file or other resource in this project does not include the above header, it should be assumed to be under the same license.
 
-JChess is a framework designed to put forth a game of chess in a Simple UI featuring both SinglePlayer against the computer as well as Mulitplayer online.
+org.jchess.JChess is a framework designed to put forth a game of chess in a Simple UI featuring both SinglePlayer against the computer as well as Mulitplayer online.
 
 This project is currently : In development.

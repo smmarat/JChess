@@ -1,4 +1,4 @@
-/*
+package org.jchess;/*
 Copyright (C) 2012 Arvind Kumar
 
 This program is free software: you can redistribute it and/or modify
@@ -47,5 +47,17 @@ public class Grid{
     }
     public void moveunallow(){
         moveallowed=false;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public int getPiece() {
+        return piece;
+    }
+
+    public boolean isOwner() {
+        return owner;
     }
 }

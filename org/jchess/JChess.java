@@ -1,4 +1,4 @@
-/*
+package org.jchess;/*
 Copyright (C) 2012 Arvind Kumar
 
 This program is free software: you can redistribute it and/or modify
@@ -17,33 +17,28 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
-public abstract class Piece{
-    
-    public abstract String imgurl(boolean white);
-    
-    public abstract boolean[][] placeMoves(Grid[][] grid);
+import javax.swing.*;
 
-    public static Piece parse(int val){
-        if (val==0){
-            return new King();
-        }
-        else if (val==10){
-            return new Pawn();
-        }
-        else if (val==20){
-            return new Bishop();
-        }
-        else if (val==30){
-            return new Knight();
-        }
-        else if (val==40){
-            return new Rook();
-        }
-        else if (val==50){
-            return new Queen();
-        }
-        else{
-            return null;
-        }
+public class JChess extends JFrame{
+    
+    Board board;    
+
+    public JChess(){
+        super("org.jchess.JChess - version 0.3 Beta");
+        setSize(415,435);
+        Board board=new Board();
+        setContentPane(board);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
+    public static void main(String args[]){
+        JChess chess=new JChess();
+        chess.begin();
+    }
+    
+    public void begin(){
+        
+    }
+    
 }

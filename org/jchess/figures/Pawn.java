@@ -1,4 +1,4 @@
-/*
+package org.jchess.figures;/*
 Copyright (C) 2012 Arvind Kumar
 
 This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,11 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
-public class Pawn extends Piece{
-    static int value=10;
+import org.jchess.Grid;
+import org.jchess.Piece;
+
+public class Pawn extends Piece {
+    public static int value=10;
     public String imgurl(boolean white){
         if (white){
             return "images/wpawn.png";
@@ -37,52 +40,52 @@ public class Pawn extends Piece{
         }
         for (int i=0;i<8;i++){
             for (int j=0;j<8;j++){
-                if (grid[i][j].selected){
-                    if (grid[i][j].owner&&i-1>-1){
-                        if (grid[i-1][j].piece==100){
+                if (grid[i][j].isSelected()){
+                    if (grid[i][j].isOwner() &&i-1>-1){
+                        if (grid[i - 1][j].getPiece() ==100){
                             res[i-1][j]=true;
                         }
                         if (j+1<8){
-                            if (grid[i-1][j+1].piece!=100){
-                                if (grid[i-1][j+1].owner!=grid[i][j].owner){
+                            if (grid[i - 1][j + 1].getPiece() !=100){
+                                if (grid[i - 1][j + 1].isOwner() != grid[i][j].isOwner()){
                                     res[i-1][j+1]=true;
                                 }
                             }
                         }
                         if (j-1>-1){
-                            if (grid[i-1][j-1].piece!=100){
-                                if (grid[i-1][j-1].owner!=grid[i][j].owner){
+                            if (grid[i - 1][j - 1].getPiece() !=100){
+                                if (grid[i - 1][j - 1].isOwner() != grid[i][j].isOwner()){
                                     res[i-1][j-1]=true;
                                 }
                             }
                         }
                     }
-                    else if ((!grid[i][j].owner)&&i+1<8){
-                        if (grid[i+1][j].piece==100){
+                    else if ((!grid[i][j].isOwner())&&i+1<8){
+                        if (grid[i + 1][j].getPiece() ==100){
                             res[i+1][j]=true;
                         }
                         if (j+1<8){
-                            if (grid[i+1][j+1].piece!=100){
-                                if (grid[i+1][j+1].owner!=grid[i][j].owner){
+                            if (grid[i + 1][j + 1].getPiece() !=100){
+                                if (grid[i + 1][j + 1].isOwner() != grid[i][j].isOwner()){
                                     res[i+1][j+1]=true;
                                 }
                             }
                         }
                         if (j-1>-1){
-                            if (grid[i+1][j-1].piece!=100){
-                                if (grid[i+1][j-1].owner!=grid[i][j].owner){
+                            if (grid[i + 1][j - 1].getPiece() !=100){
+                                if (grid[i + 1][j - 1].isOwner() != grid[i][j].isOwner()){
                                     res[i+1][j-1]=true;
                                 }
                             }
                         }
                     }
-                    if (grid[i][j].owner&&i==6){
-                        if (grid[i-2][j].piece==100){
+                    if (grid[i][j].isOwner() &&i==6){
+                        if (grid[i - 2][j].getPiece() ==100){
                             res[i-2][j]=true;
                         }
                     }
-                    if ((!grid[i][j].owner)&&i==1){
-                        if (grid[i+2][j].piece==100){
+                    if ((!grid[i][j].isOwner())&&i==1){
+                        if (grid[i + 2][j].getPiece() ==100){
                             res[i+2][j]=true;
                         }
                     }
