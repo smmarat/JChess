@@ -1,4 +1,4 @@
-package org.jchess;/*
+package org.jchess.model;/*
 Copyright (C) 2012 Arvind Kumar
 
 This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,15 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
-import org.jchess.figures.*;
+import org.jchess.model.Grid;
+import org.jchess.model.Piece;
+import org.jchess.model.figures.*;
 
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-class Board extends JPanel implements MouseListener {
+public class Board extends JPanel implements MouseListener {
 
     Grid[][] grid;
     boolean white = true;
@@ -183,6 +185,7 @@ class Board extends JPanel implements MouseListener {
                                     grid[ii][jj].changeOwner(false);
                                     grid[ii][jj].deselect();
                                     currTurn = !currTurn;
+
                                 }
                             }
                         }

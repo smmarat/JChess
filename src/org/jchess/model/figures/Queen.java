@@ -1,4 +1,4 @@
-package org.jchess.figures;/*
+package org.jchess.model.figures;/*
 Copyright (C) 2012 Arvind Kumar
 
 This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,17 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
-import org.jchess.Grid;
-import org.jchess.Piece;
+import org.jchess.model.Grid;
+import org.jchess.model.Piece;
 
-public class Rook extends Piece {
-    public static int value = 40;
+public class Queen extends Piece {
+    public static int value = 50;
 
     public String imgurl(boolean white) {
         if (white) {
-            return "images/wrook.png";
+            return "images/wqueen.png";
         } else {
-            return "images/brook.png";
+            return "images/bqueen.png";
         }
     }
 
@@ -86,6 +86,54 @@ public class Rook extends Piece {
                         }
                         res[i][jj] = true;
                         if (grid[i][jj].getPiece() != 100 && (grid[i][jj].isOwner() != grid[i][j].isOwner())) {
+                            break;
+                        }
+                    }
+                    for (int ii = i + 1, jj = j + 1; ii < 8 && jj < 8; ii++, jj++) {
+                        if (grid[ii][jj].getPiece() == 100) {
+                            res[ii][jj] = true;
+                        }
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() == grid[i][j].isOwner())) {
+                            break;
+                        }
+                        res[ii][jj] = true;
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() != grid[i][j].isOwner())) {
+                            break;
+                        }
+                    }
+                    for (int ii = i + 1, jj = j - 1; ii < 8 && jj > -1; ii++, jj--) {
+                        if (grid[ii][jj].getPiece() == 100) {
+                            res[ii][jj] = true;
+                        }
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() == grid[i][j].isOwner())) {
+                            break;
+                        }
+                        res[ii][jj] = true;
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() != grid[i][j].isOwner())) {
+                            break;
+                        }
+                    }
+                    for (int ii = i - 1, jj = j + 1; ii > -1 && jj < 8; ii--, jj++) {
+                        if (grid[ii][jj].getPiece() == 100) {
+                            res[ii][jj] = true;
+                        }
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() == grid[i][j].isOwner())) {
+                            break;
+                        }
+                        res[ii][jj] = true;
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() != grid[i][j].isOwner())) {
+                            break;
+                        }
+                    }
+                    for (int ii = i - 1, jj = j - 1; ii > -1 && jj > -1; ii--, jj--) {
+                        if (grid[ii][jj].getPiece() == 100) {
+                            res[ii][jj] = true;
+                        }
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() == grid[i][j].isOwner())) {
+                            break;
+                        }
+                        res[ii][jj] = true;
+                        if (grid[ii][jj].getPiece() != 100 && (grid[ii][jj].isOwner() != grid[i][j].isOwner())) {
                             break;
                         }
                     }

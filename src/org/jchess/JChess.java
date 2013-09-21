@@ -17,28 +17,31 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
+import org.jchess.model.Board;
+import org.jchess.model.Settings;
+
 import javax.swing.*;
 
 public class JChess extends JFrame {
 
-    Board board;
+
 
     public JChess() {
         super("org.jchess.JChess - version 0.3 Beta");
         setSize(415, 435);
-        Board board = new Board();
-        setContentPane(board);
+        setContentPane(new Settings(this));
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public static void main(String args[]) {
-        JChess chess = new JChess();
-        chess.begin();
+        new JChess();
     }
 
     public void begin() {
-
+        Board board = new Board();
+        setContentPane(board);
+        setVisible(true);
     }
 
 }
