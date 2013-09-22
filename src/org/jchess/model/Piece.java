@@ -25,18 +25,18 @@ public abstract class Piece {
 
     public abstract boolean[][] placeMoves(Grid[][] grid);
 
-    public static Piece parse(int val) {
-        if (val == 0) {
+    public static Piece parse(int val, boolean reverse) {
+        if (val == King.value) {
             return new King();
-        } else if (val == 10) {
-            return new Pawn();
-        } else if (val == 20) {
+        } else if (val == Pawn.value) {
+            return new Pawn(reverse);
+        } else if (val == Bishop.value) {
             return new Bishop();
-        } else if (val == 30) {
+        } else if (val == Knight.value) {
             return new Knight();
-        } else if (val == 40) {
+        } else if (val == Rook.value) {
             return new Rook();
-        } else if (val == 50) {
+        } else if (val == Queen.value) {
             return new Queen();
         } else {
             return null;

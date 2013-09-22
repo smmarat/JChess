@@ -18,7 +18,7 @@ Please note that in the event that any source file or other resource in this pro
 */
 
 public class Grid {
-    int piece = 100;
+    int piece = Board.CELL_SIZE*2;
     int x;
     int y;
     boolean selected = false;

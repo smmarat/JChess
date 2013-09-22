@@ -17,11 +17,13 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
+import org.jchess.model.Board;
 import org.jchess.model.Grid;
 import org.jchess.model.Piece;
 
 public class Knight extends Piece {
     public static int value = 30;
+    public static int SIZE = Board.CELL_SIZE*2;
 
     public String imgurl(boolean white) {
         if (white) {
@@ -42,56 +44,56 @@ public class Knight extends Piece {
             for (int j = 0; j < 8; j++) {
                 if (grid[i][j].isSelected()) {
                     if (i + 2 < 8 && j + 1 < 8) {
-                        if (grid[i + 2][j + 1].getPiece() == 100) {
+                        if (grid[i + 2][j + 1].getPiece() == SIZE) {
                             res[i + 2][j + 1] = true;
                         } else if (grid[i + 2][j + 1].isOwner() != grid[i][j].isOwner()) {
                             res[i + 2][j + 1] = true;
                         }
                     }
                     if (i + 2 < 8 && j - 1 > -1) {
-                        if (grid[i + 2][j - 1].getPiece() == 100) {
+                        if (grid[i + 2][j - 1].getPiece() == SIZE) {
                             res[i + 2][j - 1] = true;
                         } else if (grid[i + 2][j - 1].isOwner() != grid[i][j].isOwner()) {
                             res[i + 2][j - 1] = true;
                         }
                     }
                     if (i - 2 > -1 && j + 1 < 8) {
-                        if (grid[i - 2][j + 1].getPiece() == 100) {
+                        if (grid[i - 2][j + 1].getPiece() == SIZE) {
                             res[i - 2][j + 1] = true;
                         } else if (grid[i - 2][j + 1].isOwner() != grid[i][j].isOwner()) {
                             res[i - 2][j + 1] = true;
                         }
                     }
                     if (i - 2 > -1 && j - 1 > -1) {
-                        if (grid[i - 2][j - 1].getPiece() == 100) {
+                        if (grid[i - 2][j - 1].getPiece() == SIZE) {
                             res[i - 2][j - 1] = true;
                         } else if (grid[i - 2][j - 1].isOwner() != grid[i][j].isOwner()) {
                             res[i - 2][j - 1] = true;
                         }
                     }
                     if (i + 1 < 8 && j + 2 < 8) {
-                        if (grid[i + 1][j + 2].getPiece() == 100) {
+                        if (grid[i + 1][j + 2].getPiece() == SIZE) {
                             res[i + 1][j + 2] = true;
                         } else if (grid[i + 1][j + 2].isOwner() != grid[i][j].isOwner()) {
                             res[i + 1][j + 2] = true;
                         }
                     }
                     if (i + 1 < 8 && j - 2 > -1) {
-                        if (grid[i + 1][j - 2].getPiece() == 100) {
+                        if (grid[i + 1][j - 2].getPiece() == SIZE) {
                             res[i + 1][j - 2] = true;
                         } else if (grid[i + 1][j - 2].isOwner() != grid[i][j].isOwner()) {
                             res[i + 1][j - 2] = true;
                         }
                     }
                     if (i - 1 > -1 && j + 2 < 8) {
-                        if (grid[i - 1][j + 2].getPiece() == 100) {
+                        if (grid[i - 1][j + 2].getPiece() == SIZE) {
                             res[i - 1][j + 2] = true;
                         } else if (grid[i - 1][j + 2].isOwner() != grid[i][j].isOwner()) {
                             res[i - 1][j + 2] = true;
                         }
                     }
                     if (i - 1 > -1 && j - 2 > -1) {
-                        if (grid[i - 1][j - 2].getPiece() == 100) {
+                        if (grid[i - 1][j - 2].getPiece() == SIZE) {
                             res[i - 1][j - 2] = true;
                         } else if (grid[i - 1][j - 2].isOwner() != grid[i][j].isOwner()) {
                             res[i - 1][j - 2] = true;

@@ -17,11 +17,13 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
+import org.jchess.model.Board;
 import org.jchess.model.Grid;
 import org.jchess.model.Piece;
 
 public class King extends Piece {
     public static int value = 0;
+    public static int SIZE = Board.CELL_SIZE*2;
 
     public String imgurl(boolean white) {
         if (white) {
@@ -42,56 +44,56 @@ public class King extends Piece {
             for (int j = 0; j < 8; j++) {
                 if (grid[i][j].isSelected()) {
                     if (i + 1 < 8) {
-                        if (grid[i + 1][j].getPiece() == 100) {
+                        if (grid[i + 1][j].getPiece() == SIZE) {
                             res[i + 1][j] = true;
                         } else if (grid[i + 1][j].isOwner() != grid[i][j].isOwner()) {
                             res[i + 1][j] = true;
                         }
                     }
                     if (i - 1 > -1) {
-                        if (grid[i - 1][j].getPiece() == 100) {
+                        if (grid[i - 1][j].getPiece() == SIZE) {
                             res[i - 1][j] = true;
                         } else if (grid[i - 1][j].isOwner() != grid[i][j].isOwner()) {
                             res[i - 1][j] = true;
                         }
                     }
                     if (j + 1 < 8) {
-                        if (grid[i][j + 1].getPiece() == 100) {
+                        if (grid[i][j + 1].getPiece() == SIZE) {
                             res[i][j + 1] = true;
                         } else if (grid[i][j + 1].isOwner() != grid[i][j].isOwner()) {
                             res[i][j + 1] = true;
                         }
                     }
                     if (j - 1 > -1) {
-                        if (grid[i][j - 1].getPiece() == 100) {
+                        if (grid[i][j - 1].getPiece() == SIZE) {
                             res[i][j - 1] = true;
                         } else if (grid[i][j - 1].isOwner() != grid[i][j].isOwner()) {
                             res[i][j - 1] = true;
                         }
                     }
                     if (i + 1 < 8 && j + 1 < 8) {
-                        if (grid[i + 1][j + 1].getPiece() == 100) {
+                        if (grid[i + 1][j + 1].getPiece() == SIZE) {
                             res[i + 1][j + 1] = true;
                         } else if (grid[i + 1][j + 1].isOwner() != grid[i][j].isOwner()) {
                             res[i + 1][j + 1] = true;
                         }
                     }
                     if (i + 1 < 8 && j - 1 > -1) {
-                        if (grid[i + 1][j - 1].getPiece() == 100) {
+                        if (grid[i + 1][j - 1].getPiece() == SIZE) {
                             res[i + 1][j - 1] = true;
                         } else if (grid[i + 1][j - 1].isOwner() != grid[i][j].isOwner()) {
                             res[i + 1][j - 1] = true;
                         }
                     }
                     if (i - 1 > -1 && j - 1 > -1) {
-                        if (grid[i - 1][j - 1].getPiece() == 100) {
+                        if (grid[i - 1][j - 1].getPiece() == SIZE) {
                             res[i - 1][j - 1] = true;
                         } else if (grid[i - 1][j - 1].isOwner() != grid[i][j].isOwner()) {
                             res[i - 1][j - 1] = true;
                         }
                     }
                     if (i - 1 > -1 && j + 1 < 8) {
-                        if (grid[i - 1][j + 1].getPiece() == 100) {
+                        if (grid[i - 1][j + 1].getPiece() == SIZE) {
                             res[i - 1][j + 1] = true;
                         } else if (grid[i - 1][j + 1].isOwner() != grid[i][j].isOwner()) {
                             res[i - 1][j + 1] = true;

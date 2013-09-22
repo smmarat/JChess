@@ -18,18 +18,26 @@ Please note that in the event that any source file or other resource in this pro
 */
 
 import org.jchess.model.Board;
-import org.jchess.model.Settings;
+import org.jchess.model.GameSelector;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class JChess extends JFrame {
 
-
+    public static final int SERVER_PORT = 8989;
+    private Socket socket;
+    private Board board;
 
     public JChess() {
         super("org.jchess.JChess - version 0.3 Beta");
-        setSize(415, 435);
-        setContentPane(new Settings(this));
+        setResizable(false);
+        setContentPane(new GameSelector(this));
+        pack();
+        setCenterPosition(this);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -39,9 +47,49 @@ public class JChess extends JFrame {
     }
 
     public void begin() {
-        Board board = new Board();
+        setPreferredSize(new Dimension(8*Board.CELL_SIZE+6, 8*Board.CELL_SIZE+26));
+        if (board==null) board = new Board(false, true);
         setContentPane(board);
+        pack();
+        setCenterPosition(this);
         setVisible(true);
     }
 
+    public void startServer() {
+        final JLabel label = new JLabel("Waiting for connection...");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ServerSocket ss = new ServerSocket(SERVER_PORT);
+                    socket = ss.accept();
+                    board = new Board(true, false);
+                    new CommandListener(socket.getInputStream(), board).start();
+                    System.err.println("incoming new connection...");
+                    SwingUtilities.getWindowAncestor(label).dispose();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        JOptionPane.showMessageDialog(null, label);
+    }
+
+    public void connect(String ip) throws IOException {
+        socket = new Socket(ip, SERVER_PORT);
+        board = new Board(false, false);
+        new CommandListener(socket.getInputStream(), board).start();
+    }
+
+    private void setCenterPosition(JFrame frame) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension frameSize = frame.getPreferredSize();
+        if (frameSize.height > screenSize.height) {
+            frameSize.height = screenSize.height;
+        }
+        if (frameSize.width > screenSize.width) {
+            frameSize.width = screenSize.width;
+        }
+        frame.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+    }
 }

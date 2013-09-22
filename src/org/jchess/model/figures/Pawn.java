@@ -17,11 +17,18 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
+import org.jchess.model.Board;
 import org.jchess.model.Grid;
 import org.jchess.model.Piece;
 
 public class Pawn extends Piece {
     public static int value = 10;
+    public static int SIZE = Board.CELL_SIZE*2;
+    private boolean reverse = false;
+
+    public Pawn(boolean reverse) {
+        this.reverse = reverse;
+    }
 
     public String imgurl(boolean white) {
         if (white) {
@@ -41,51 +48,54 @@ public class Pawn extends Piece {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (grid[i][j].isSelected()) {
-                    if (grid[i][j].isOwner() && i - 1 > -1) {
-                        if (grid[i - 1][j].getPiece() == 100) {
-                            res[i - 1][j] = true;
+                    int nextI = reverse ? (grid[i][j].isOwner() ? i+1 : i-1) : (grid[i][j].isOwner() ? i-1 : i+1);
+                    if (grid[i][j].isOwner() && nextI > -1) {
+                        if (grid[nextI][j].getPiece() == SIZE) {
+                            res[nextI][j] = true;
                         }
                         if (j + 1 < 8) {
-                            if (grid[i - 1][j + 1].getPiece() != 100) {
-                                if (grid[i - 1][j + 1].isOwner() != grid[i][j].isOwner()) {
-                                    res[i - 1][j + 1] = true;
+                            if (grid[nextI][j + 1].getPiece() != SIZE) {
+                                if (grid[nextI][j + 1].isOwner() != grid[i][j].isOwner()) {
+                                    res[nextI][j + 1] = true;
                                 }
                             }
                         }
                         if (j - 1 > -1) {
-                            if (grid[i - 1][j - 1].getPiece() != 100) {
-                                if (grid[i - 1][j - 1].isOwner() != grid[i][j].isOwner()) {
-                                    res[i - 1][j - 1] = true;
+                            if (grid[nextI][j - 1].getPiece() != SIZE) {
+                                if (grid[nextI][j - 1].isOwner() != grid[i][j].isOwner()) {
+                                    res[nextI][j - 1] = true;
                                 }
                             }
                         }
-                    } else if ((!grid[i][j].isOwner()) && i + 1 < 8) {
-                        if (grid[i + 1][j].getPiece() == 100) {
-                            res[i + 1][j] = true;
+                    } else if ((!grid[i][j].isOwner()) && nextI < 8) {
+                        if (grid[nextI][j].getPiece() == SIZE) {
+                            res[nextI][j] = true;
                         }
                         if (j + 1 < 8) {
-                            if (grid[i + 1][j + 1].getPiece() != 100) {
-                                if (grid[i + 1][j + 1].isOwner() != grid[i][j].isOwner()) {
-                                    res[i + 1][j + 1] = true;
+                            if (grid[nextI][j + 1].getPiece() != SIZE) {
+                                if (grid[nextI][j + 1].isOwner() != grid[i][j].isOwner()) {
+                                    res[nextI][j + 1] = true;
                                 }
                             }
                         }
                         if (j - 1 > -1) {
-                            if (grid[i + 1][j - 1].getPiece() != 100) {
-                                if (grid[i + 1][j - 1].isOwner() != grid[i][j].isOwner()) {
-                                    res[i + 1][j - 1] = true;
+                            if (grid[nextI][j - 1].getPiece() != SIZE) {
+                                if (grid[nextI][j - 1].isOwner() != grid[i][j].isOwner()) {
+                                    res[nextI][j - 1] = true;
                                 }
                             }
                         }
                     }
-                    if (grid[i][j].isOwner() && i == 6) {
-                        if (grid[i - 2][j].getPiece() == 100) {
-                            res[i - 2][j] = true;
+                    nextI = reverse ? (grid[i][j].isOwner() ? i+2 : i-2) : (grid[i][j].isOwner() ? i-2 : i+2);
+                    boolean ownerLine = reverse ? !grid[i][j].isOwner() : grid[i][j].isOwner();
+                    if (ownerLine && i == 6) {
+                        if (grid[nextI][j].getPiece() == 100) {
+                            res[nextI][j] = true;
                         }
                     }
-                    if ((!grid[i][j].isOwner()) && i == 1) {
-                        if (grid[i + 2][j].getPiece() == 100) {
-                            res[i + 2][j] = true;
+                    if (!ownerLine && i == 1) {
+                        if (grid[nextI][j].getPiece() == 100) {
+                            res[nextI][j] = true;
                         }
                     }
                 }

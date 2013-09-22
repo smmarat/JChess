@@ -28,46 +28,48 @@ import java.awt.event.*;
 public class Board extends JPanel implements MouseListener {
 
     Grid[][] grid;
-    boolean white = true;
     private boolean currTurn = true;
+    public static final int CELL_SIZE = 50;
+    private boolean reverse;
 
-    public Board() {
+    public Board(boolean isWhite, boolean isLocal) {
+        reverse = !isWhite;
         addMouseListener(this);
         grid = new Grid[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                grid[i][j] = new Grid(j * 50, i * 50);
+                grid[i][j] = new Grid(j * CELL_SIZE, i * CELL_SIZE);
             }
         }
         for (int i = 0; i < 8; i++) {
             (grid[1][i]).changePiece(Pawn.value);
             (grid[6][i]).changePiece(Pawn.value);
-            (grid[6][i]).changeOwner(true);
+            (grid[isWhite ? 6 : 1][i]).changeOwner(true);
         }
         grid[0][1].changePiece(Knight.value);
         grid[0][6].changePiece(Knight.value);
         grid[7][1].changePiece(Knight.value);
         grid[7][6].changePiece(Knight.value);
-        grid[7][1].changeOwner(true);
-        grid[7][6].changeOwner(true);
+        grid[isWhite ? 7 : 0][1].changeOwner(true);
+        grid[isWhite ? 7 : 0][6].changeOwner(true);
         grid[0][2].changePiece(Bishop.value);
         grid[0][5].changePiece(Bishop.value);
         grid[7][2].changePiece(Bishop.value);
         grid[7][5].changePiece(Bishop.value);
-        grid[7][2].changeOwner(true);
-        grid[7][5].changeOwner(true);
+        grid[isWhite ? 7 : 0][2].changeOwner(true);
+        grid[isWhite ? 7 : 0][5].changeOwner(true);
         grid[0][0].changePiece(Rook.value);
         grid[0][7].changePiece(Rook.value);
         grid[7][0].changePiece(Rook.value);
         grid[7][7].changePiece(Rook.value);
-        grid[7][0].changeOwner(true);
-        grid[7][7].changeOwner(true);
+        grid[isWhite ? 7 : 0][0].changeOwner(true);
+        grid[isWhite ? 7 : 0][7].changeOwner(true);
         grid[0][3].changePiece(Queen.value);
         grid[0][4].changePiece(King.value);
         grid[7][3].changePiece(Queen.value);
         grid[7][4].changePiece(King.value);
-        grid[7][3].changeOwner(true);
-        grid[7][4].changeOwner(true);
+        grid[isWhite ? 7 : 0][3].changeOwner(true);
+        grid[isWhite ? 7 : 0][4].changeOwner(true);
     }
 
     public void paintComponent(Graphics g) {
@@ -75,9 +77,9 @@ public class Board extends JPanel implements MouseListener {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j <= 6; j += 2) {
                 if (i % 2 == 0) {
-                    g.fillRect((j + 1) * 50, i * 50, 50, 50);
+                    g.fillRect((j + 1) * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 } else {
-                    g.fillRect(j * 50, i * 50, 50, 50);
+                    g.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 }
             }
         }
@@ -85,9 +87,9 @@ public class Board extends JPanel implements MouseListener {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j <= 6; j += 2) {
                 if (i % 2 == 0) {
-                    g.fillRect(j * 50, i * 50, 50, 50);
+                    g.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 } else {
-                    g.fillRect((j + 1) * 50, i * 50, 50, 50);
+                    g.fillRect((j + 1) * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 }
             }
         }
@@ -95,7 +97,7 @@ public class Board extends JPanel implements MouseListener {
             for (int j = 0; j < 8; j++) {
                 if (grid[i][j].selected) {
                     g.setColor(Color.BLUE);
-                    g.fillRect(grid[i][j].x, grid[i][j].y, 50, 50);
+                    g.fillRect(grid[i][j].x, grid[i][j].y, CELL_SIZE, CELL_SIZE);
                     g.setColor(Color.DARK_GRAY);
                 }
             }
@@ -104,7 +106,7 @@ public class Board extends JPanel implements MouseListener {
             for (int j = 0; j < 8; j++) {
                 if (grid[i][j].moveallowed) {
                     g.setColor(Color.GREEN);
-                    g.fillRect(grid[i][j].x, grid[i][j].y, 50, 50);
+                    g.fillRect(grid[i][j].x, grid[i][j].y, CELL_SIZE, CELL_SIZE);
                     g.setColor(Color.DARK_GRAY);
                 }
             }
@@ -112,14 +114,14 @@ public class Board extends JPanel implements MouseListener {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (grid[i][j].moveallowed) {
-                    g.drawRect(grid[i][j].x + 1, grid[i][j].y + 1, 47, 47);
+                    g.drawRect(grid[i][j].x + 1, grid[i][j].y + 1, CELL_SIZE-3, CELL_SIZE-3);
                 }
             }
         }
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if ((grid[i][j]).piece != 100) {
-                    g.drawImage(Toolkit.getDefaultToolkit().getImage(Piece.parse((grid[i][j]).piece).imgurl(white && grid[i][j].owner)), (grid[i][j]).x + 10, (grid[i][j]).y + 10, this);
+                if ((grid[i][j]).piece != CELL_SIZE*2) {
+                    g.drawImage(Toolkit.getDefaultToolkit().getImage(Piece.parse((grid[i][j]).piece, reverse).imgurl(grid[i][j].owner)), (grid[i][j]).x + CELL_SIZE*2/10, (grid[i][j]).y + CELL_SIZE*2/10, this);
                 }
             }
         }
@@ -141,11 +143,18 @@ public class Board extends JPanel implements MouseListener {
         return false;
     }
 
-    public void swapMoveArray(boolean[][] res) {
+    public void swapMoveArray() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (res[i][j]) {
-                    grid[i][j].moveallow();
+                if (grid[i][j].selected && grid[i][j].piece != CELL_SIZE*2) {
+                    boolean[][] res = Piece.parse(grid[i][j].piece, reverse).placeMoves(grid);
+                    for (int n = 0; n < 8; n++) {
+                        for (int m = 0; m < 8; m++) {
+                            if (res[n][m]) {
+                                grid[n][m].moveallow();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -170,22 +179,21 @@ public class Board extends JPanel implements MouseListener {
     public void mousePressed(MouseEvent e) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (grid[i][j].x == e.getX() - (e.getX() % 50) && grid[i][j].y == e.getY() - (e.getY() % 50) && grid[i][j].selected) {
+                if (grid[i][j].x == e.getX() - (e.getX() % CELL_SIZE) && grid[i][j].y == e.getY() - (e.getY() % CELL_SIZE) && grid[i][j].selected) {
                     grid[i][j].deselect();
-                } else if (grid[i][j].x == e.getX() - (e.getX() % 50) && grid[i][j].y == e.getY() - (e.getY() % 50) && (!grid[i][j].selected) && (!hasSelect())) {
+                } else if (grid[i][j].x == e.getX() - (e.getX() % CELL_SIZE) && grid[i][j].y == e.getY() - (e.getY() % CELL_SIZE) && (!grid[i][j].selected) && (!hasSelect())) {
                     grid[i][j].select();
-                } else if (grid[i][j].x == e.getX() - (e.getX() % 50) && grid[i][j].y == e.getY() - (e.getY() % 50) && (!grid[i][j].selected) && hasSelect()) {
+                } else if (grid[i][j].x == e.getX() - (e.getX() % CELL_SIZE) && grid[i][j].y == e.getY() - (e.getY() % CELL_SIZE) && (!grid[i][j].selected) && hasSelect()) {
                     for (int ii = 0; ii < 8; ii++) {
                         for (int jj = 0; jj < 8; jj++) {
-                            if (grid[ii][jj].selected && grid[ii][jj].piece != 100) {
-                                if (Piece.parse(grid[ii][jj].piece).placeMoves(grid)[i][j] && grid[ii][jj].owner==currTurn) {
+                            if (grid[ii][jj].selected && grid[ii][jj].piece != CELL_SIZE*2) {
+                                if (Piece.parse(grid[ii][jj].piece, reverse).placeMoves(grid)[i][j] && grid[ii][jj].owner==currTurn) {
                                     grid[i][j].changePiece(grid[ii][jj].piece);
-                                    grid[ii][jj].changePiece(100);
+                                    grid[ii][jj].changePiece(CELL_SIZE*2);
                                     grid[i][j].changeOwner(grid[ii][jj].owner);
                                     grid[ii][jj].changeOwner(false);
                                     grid[ii][jj].deselect();
                                     currTurn = !currTurn;
-
                                 }
                             }
                         }
@@ -193,13 +201,15 @@ public class Board extends JPanel implements MouseListener {
                 }
             }
         }
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (grid[i][j].selected && grid[i][j].piece != 100) {
-                    swapMoveArray(Piece.parse(grid[i][j].piece).placeMoves(grid));
-                }
-            }
-        }
+        swapMoveArray();
+//        for (int i = 0; i < 8; i++) {
+//            for (int j = 0; j < 8; j++) {
+//                if (grid[i][j].selected && grid[i][j].piece != CELL_SIZE*2) {
+//                    swapMoveArray(Piece.parse(grid[i][j].piece).placeMoves(grid));
+//                }
+//            }
+//        }
         repaint();
     }
+
 }
