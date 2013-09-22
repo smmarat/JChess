@@ -17,6 +17,7 @@ along with this program.  If not,see <http://www.gnu.org/licenses/>
 Please note that in the event that any source file or other resource in this project does not include the above header,it should be assumed to be under the same license.
 */
 
+import org.jchess.JChess;
 import org.jchess.model.Grid;
 import org.jchess.model.Piece;
 import org.jchess.model.figures.*;
@@ -31,8 +32,10 @@ public class Board extends JPanel implements MouseListener {
     private boolean currTurn = true;
     public static final int CELL_SIZE = 50;
     private boolean reverse;
+    private JChess main;
 
-    public Board(boolean isWhite, boolean isLocal) {
+    public Board(boolean isWhite, JChess main) {
+        this.main = main;
         reverse = !isWhite;
         addMouseListener(this);
         grid = new Grid[8][8];
@@ -143,23 +146,6 @@ public class Board extends JPanel implements MouseListener {
         return false;
     }
 
-    public void swapMoveArray() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (grid[i][j].selected && grid[i][j].piece != CELL_SIZE*2) {
-                    boolean[][] res = Piece.parse(grid[i][j].piece, reverse).placeMoves(grid);
-                    for (int n = 0; n < 8; n++) {
-                        for (int m = 0; m < 8; m++) {
-                            if (res[n][m]) {
-                                grid[n][m].moveallow();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void mouseClicked(MouseEvent e) {
 
     }
@@ -177,13 +163,18 @@ public class Board extends JPanel implements MouseListener {
     }
 
     public void mousePressed(MouseEvent e) {
+        main.send(e.getX()+"~"+(CELL_SIZE * 8 - e.getY()));
+        touch(e.getX(), e.getY());
+    }
+
+    public void touch(int x, int y) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (grid[i][j].x == e.getX() - (e.getX() % CELL_SIZE) && grid[i][j].y == e.getY() - (e.getY() % CELL_SIZE) && grid[i][j].selected) {
+                if (grid[i][j].x == x - (x % CELL_SIZE) && grid[i][j].y == y - (y % CELL_SIZE) && grid[i][j].selected) {
                     grid[i][j].deselect();
-                } else if (grid[i][j].x == e.getX() - (e.getX() % CELL_SIZE) && grid[i][j].y == e.getY() - (e.getY() % CELL_SIZE) && (!grid[i][j].selected) && (!hasSelect())) {
+                } else if (grid[i][j].x == x - (x % CELL_SIZE) && grid[i][j].y == y - (y % CELL_SIZE) && (!grid[i][j].selected) && (!hasSelect())) {
                     grid[i][j].select();
-                } else if (grid[i][j].x == e.getX() - (e.getX() % CELL_SIZE) && grid[i][j].y == e.getY() - (e.getY() % CELL_SIZE) && (!grid[i][j].selected) && hasSelect()) {
+                } else if (grid[i][j].x == x - (x % CELL_SIZE) && grid[i][j].y == y - (y % CELL_SIZE) && (!grid[i][j].selected) && hasSelect()) {
                     for (int ii = 0; ii < 8; ii++) {
                         for (int jj = 0; jj < 8; jj++) {
                             if (grid[ii][jj].selected && grid[ii][jj].piece != CELL_SIZE*2) {
@@ -201,14 +192,20 @@ public class Board extends JPanel implements MouseListener {
                 }
             }
         }
-        swapMoveArray();
-//        for (int i = 0; i < 8; i++) {
-//            for (int j = 0; j < 8; j++) {
-//                if (grid[i][j].selected && grid[i][j].piece != CELL_SIZE*2) {
-//                    swapMoveArray(Piece.parse(grid[i][j].piece).placeMoves(grid));
-//                }
-//            }
-//        }
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (grid[i][j].selected && grid[i][j].piece != CELL_SIZE*2) {
+                    boolean[][] res = Piece.parse(grid[i][j].piece, reverse).placeMoves(grid);
+                    for (int n = 0; n < 8; n++) {
+                        for (int m = 0; m < 8; m++) {
+                            if (res[n][m]) {
+                                grid[n][m].moveallow();
+                            }
+                        }
+                    }
+                }
+            }
+        }
         repaint();
     }
 

@@ -2,6 +2,7 @@ package org.jchess;
 
 import org.jchess.model.Board;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,11 +29,21 @@ public class CommandListener extends Thread {
         try {
             while (true) {
                 String command = in.readLine();
-                // TODO: translate remote movement to board
+                System.err.println("receive: "+command);
+                if (command!=null) {
+                    if (command.contains("~")) {
+                        try {
+                            String[] point = command.trim().split("~");
+                            board.touch(Integer.parseInt(point[0]), Integer.parseInt(point[1]));
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Connection lost!");
         }
-
     }
 }

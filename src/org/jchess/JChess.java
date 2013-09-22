@@ -22,7 +22,9 @@ import org.jchess.model.GameSelector;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -48,7 +50,7 @@ public class JChess extends JFrame {
 
     public void begin() {
         setPreferredSize(new Dimension(8*Board.CELL_SIZE+6, 8*Board.CELL_SIZE+26));
-        if (board==null) board = new Board(false, true);
+        if (board==null) board = new Board(false, this);
         setContentPane(board);
         pack();
         setCenterPosition(this);
@@ -63,7 +65,7 @@ public class JChess extends JFrame {
                 try {
                     ServerSocket ss = new ServerSocket(SERVER_PORT);
                     socket = ss.accept();
-                    board = new Board(true, false);
+                    board = new Board(true, JChess.this);
                     new CommandListener(socket.getInputStream(), board).start();
                     System.err.println("incoming new connection...");
                     SwingUtilities.getWindowAncestor(label).dispose();
@@ -77,8 +79,21 @@ public class JChess extends JFrame {
 
     public void connect(String ip) throws IOException {
         socket = new Socket(ip, SERVER_PORT);
-        board = new Board(false, false);
+        board = new Board(false, this);
         new CommandListener(socket.getInputStream(), board).start();
+    }
+
+    public void send(String msg) {
+        if (socket!=null) {
+            try {
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                out.write(msg);
+                out.newLine();
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void setCenterPosition(JFrame frame) {
