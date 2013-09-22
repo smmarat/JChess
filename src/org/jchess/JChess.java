@@ -1,4 +1,5 @@
-package org.jchess;/*
+package org.jchess;
+/*
 Copyright (C) 2012 Arvind Kumar
 
 This program is free software: you can redistribute it and/or modify

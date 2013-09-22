@@ -1,20 +1,2 @@
-Copyright (C) 2012 Arvind Kumar
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-Please note that in the event that any source file or other resource in this project does not include the above header, it should be assumed to be under the same license.
-
-org.jchess.JChess is a framework designed to put forth a game of chess in a Simple UI featuring both SinglePlayer against the computer as well as Mulitplayer online.
-
-This project is currently : In development.
+Simple chess game. You can play with other human on your computer or through local network. 
+You don't need install any servers. Your computer must allow incoming connection on port 8989 (if you start game as server) and your opponent must know ip address of your computer.
